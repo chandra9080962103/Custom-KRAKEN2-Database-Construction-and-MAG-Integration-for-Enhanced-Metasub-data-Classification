@@ -1,5 +1,3 @@
-# KRAKEN2 Custom Database and MAG Integration for Metagenomics
-
 This repository provides a workflow to build a custom KRAKEN2 database from completed genomes of Bacteria, Fungi, and Archaea (NCBI RefSeq), and to integrate Metagenome-Assembled Genomes (MAGs) derived from MetaSUB samples for improved metagenomic classification accuracy.
 
 ## Overview

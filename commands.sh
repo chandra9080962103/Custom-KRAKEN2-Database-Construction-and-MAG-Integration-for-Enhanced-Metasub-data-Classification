@@ -289,8 +289,30 @@ for fasta in *.fa; do
 done
 
 # So finally we have our MAGs ready to be integrated with de replicated completed genomes for the Fnal KRAKEN2 database building.
-# Once again run Checkm2 and dRep on the folder that contains Final_MAGs + de_replicated_completed_genomes, to remove redundant ones using similar commands as used before.
-# Then use a simple 
+# Once again run Checkm2 and dRep on the folder that contains all the Final MAGs and dereplicated completed genomes fasta files, to remove redundant ones using similar commands as used before.
+# Now use the code corresponding to building All_genomes.fa file from the code.py file to concat all the Final MAGs and dereplicated completed genomes fasta files.
+
+# Use the script below for the final kraken2 db building
+#!/bin/bash
+
+# Activate Kraken2 conda environment
+source /path/to/miniconda3/bin/activate kraken2
+
+# Set variables
+LIB_DIR="/path/to/FINAL_KRAKEN2_DB"
+DB_DIR="/path/to/FINAL_KRAKEN2_DB/DB"
+
+$ cp -r /path/to/taxonomy_folder "$DB_DIR"
+$ kraken2-build --add-to-library "$LIB_DIR/All_genomes.fa" --db "$DB_DIR"
+
+# Build the Kraken2 database
+kraken2-build --build --db "$DB_DIR"
+
+# Deactivate conda environment
+conda deactivate
+
+# Now use the previously built completed genome kraken2 database to classify new metasub data like chennai, then again classify this metasub data using the new Final kraken DB with MAGs and see if the classification improves and does it get mapped to any of novel MAGs.
+# This guides research of Metasub mircobiome in a good direction.
 
 
 

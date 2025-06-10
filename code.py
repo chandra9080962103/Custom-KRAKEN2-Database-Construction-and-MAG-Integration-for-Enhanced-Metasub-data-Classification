@@ -69,3 +69,23 @@ with open(output_file, 'w') as outfile:
                     outfile.write(line.rstrip() + '\n')
 
 print(f"Combined sequences saved to {output_file}")
+
+
+# Code for concatenating Final MAGs and dereplicated completed genomes into a single All_genomes.fa file.
+# Place all the Final MAGs and dereplicated completed genomes fasta files into a single folder.
+
+import os
+
+# Directory containing all the Final MAGs and dereplicated completed genomes fasta files
+directory = '/path/to/your/all_genomes_folder'  # Change this to your folder path
+output_file = 'All_genomes.fa'
+
+with open(output_file, 'w') as outfile:
+    for filename in os.listdir(directory):
+        if filename.endswith(('.fna', '.fa')):
+            with open(os.path.join(directory, filename), 'r') as infile:
+                lines = infile.readlines()
+                for line in lines:
+                    outfile.write(line.rstrip() + '\n')
+
+print(f"Combined sequences saved to {output_file}")

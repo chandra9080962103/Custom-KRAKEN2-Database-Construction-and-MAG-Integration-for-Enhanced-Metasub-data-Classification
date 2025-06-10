@@ -232,6 +232,65 @@ gtdbtk classify_wf \
     --extension .fa \
     --skip_ani_screen
 
+# Similarly run checkm2 for completed genomes built initially, de replicate them and keep them ready for integration with these de replicated MAGs for final kraken2 database building.
+# Now to build the final kraken database, all the genomes should be associated with a tax id. Since the completed genomes were downloaded from NCBI, they are annotated with NCBI_taxonomy while kraken db building.
+# But for the MAGs, from gtbdtk we get the taxonomic names and their closest match accession ids (if they have species level classification). So to fetch tax ids from taxa names, we use a package named taxonomizr (CRAN package used in R).
+
+# Taxonomizr installation:
+$ R
+$ install.packages("taxonomizr")
+
+# Extract the taxonomic names that corresponds to the last name in each GTDBTK classification of each of the MAG into a text file
+# Use the following R script to run taxonomizr on the extracted taxa names to fetch tax ids
+library(taxonomizr)
+prepareDatabase('accessionTaxa.sql')
+
+# Read the file into a character vector
+names <- scan("/path/to/taxa_names.txt", what = "", sep = "\n", quote = "'")
+
+# Query taxonomic IDs for each name
+tax_ids <- getId(names, "accessionTaxa.sql")
+
+# Combine results into a data frame
+result <- data.frame(Name = names, TaxID = tax_ids)
+
+# Print results
+print(result)
+
+# Save to a file
+write.table(result, "tax_ids.tsv", sep = "\t", row.names = FALSE, quote = FALSE)
+
+# Now add a column to GTDBTK classification for tax ids and annotate the MAGs with tax ids in the same order.
+# Here some MAGs may not have species level classification, hence tax ids cannot be generated for them using taxonomizr, for all those MAGs extract the taxa names upto what they have and manually get tax ids from ncbi taxonomy website.
+# Using these tax ids we have to create kraken_headers for each of the MAGs and incorporate it as the header line for each of MAG fasta files using the kraken2 documentation for custom database building.
+# The format of the headers look like:
+>"MAG_name"|kraken:taxid|"tax_id corresposning to the MAG" "name of the MAG"
+
+# an example of this would like:
+>haib17CEM5241_HMCMJCCXY_SL336208_BIN_REASSEMBLY_bin_1orig|kraken:taxid|45404 Novel Beijerinckiaceae MAG
+# here "haib17CEM5241_HMCMJCCXY_SL336208_BIN_REASSEMBLY_bin_1orig" is the MAG_name, "45404" is its tax id, the name "Novel Beijerinckiaceae MAG" signifies that this MAG doesnt have a species level classification as its written Novel and has classification only upto the taxa name: Beijerinckiaceae
+
+# Similarly fetch kraken_header lines for all MAGs and add it as a additional column to the GTDBTK classification. 
+# Once this is done, use the below script to add the header line of each MAG from the GTDBTK classification to the corresponding MAG fasta files.
+
+for fasta in *.fa; do
+    base="${fasta%.fa}"
+    # Use awk to extract the Kraken_header for this base name
+    kraken_header=$(awk -F'\t' -v name="$base" 'NR>1 && $1==name {print $5}' Processed_GTDBTK_MAGs.csv)
+    if [ -n "$kraken_header" ]; then
+        tmpfile=$(mktemp)
+        echo "$kraken_header" > "$tmpfile"
+        cat "$fasta" >> "$tmpfile"
+        mv "$tmpfile" "$fasta"
+        echo "Prepended Kraken header to $fasta"
+    else
+        echo "No Kraken_header found for $base"
+    fi
+done
+
+# So finally we have our MAGs ready to be integrated with de replicated completed genomes for the Fnal KRAKEN2 database building.
+# Once again run Checkm2 and dRep on the folder that contains Final_MAGs + de_replicated_completed_genomes, to remove redundant ones using similar commands as used before.
+# Then use a simple 
 
 
 

@@ -7,21 +7,17 @@ This repository provides a workflow to build a custom KRAKEN2 database from comp
 - **Integrates high-quality, dereplicated MAGs** into the KRAKEN2 database.
 - **Improves taxonomic classification** for new MetaSUB datasets (e.g., Chennai samples) using both reference genomes and MAGs.
 
-## Workflow
+## Quick Start
 
-1. **Database Construction**
-   - Download completed genomes from NCBI RefSeq.
-   - Use KRAKEN2 to build a custom reference database.
+1. Install all required tools and environments.
+2. Download and prepare reference genomes.
+3. Build an initial KRAKEN2 database.
+4. Download and process MetaSUB data.
+5. Assemble, bin, and dereplicate MAGs.
+6. Classify MAGs with GTDB-Tk and assign taxIDs.
+7. Integrate MAGs and completed genomes into the final KRAKEN2 database.
+8. Evaluate classification improvements.
 
-2. **MAG Assembly and Dereplication**
-   - Assemble and bin metagenomic reads from MetaSUB samples using metaWRAP.
-   - Dereplicate MAGs using dRep to obtain a non-redundant genome set.
+## Detailed Workflow
 
-3. **MAG Integration**
-   - Assign unique taxIDs to MAGs.
-   - Add MAGs to the KRAKEN2 database as new reference sequences[3].
-   - Use GTDB-tk for taxonomic classification of MAGs.
-
-4. **Classification of New Data**
-   - Use the updated KRAKEN2 database to classify new metagenomic samples (e.g., Chennai MetaSUB data).
-   - Evaluate improvements in taxonomic assignment.
+For detailed workflow look into the commands.sh file
